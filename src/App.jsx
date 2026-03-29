@@ -32,16 +32,17 @@ const sb = {
     }),
   })
 };
-const CLAUDE_KEY = import.meta.env.VITE_ANTHROPIC_KEY || "";
+// API calls go through /api/claude proxy (key stored securely on server)
 
 // ─── CLAUDE API ───────────────────────────────────────────────────────────────
 async function callClaude(messages, system, tools) {
   const body = { model: "claude-sonnet-4-20250514", max_tokens: 1800, messages };
   if (system) body.system = system;
   if (tools) body.tools = tools;
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
+  // Use secure server proxy — key never exposed in browser
+  const res = await fetch("/api/claude", {
     method: "POST",
-    headers: { "Content-Type": "application/json", "x-api-key": CLAUDE_KEY, "anthropic-version": "2023-06-01" },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
   const data = await res.json();
